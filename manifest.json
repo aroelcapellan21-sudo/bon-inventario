@@ -1,0 +1,27 @@
+{
+  "name": "Bon Inventario",
+  "short_name": "Bon",
+  "description": "Control de ventas de helados Bon",
+  "start_url": "app.html",
+  "display": "standalone",
+  "background_color": "#CC0000",
+  "theme_color": "#CC0000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f366.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f366.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f366.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
