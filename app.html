@@ -54,6 +54,8 @@
         .venta-grupo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
         .venta-hora{font-size:11px;color:var(--gris);font-weight:600}
         .venta-borrar{background:none;border:none;font-size:16px;cursor:pointer;opacity:.35;padding:2px 4px}
+        .venta-editar{background:none;border:none;font-size:16px;cursor:pointer;opacity:.5;padding:2px 4px}
+        .venta-acciones{display:flex;gap:4px}
         .venta-linea{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5}
         .venta-linea:last-of-type{border-bottom:none}
         .venta-cant-badge{background:var(--rojo);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;margin-right:10px}
@@ -173,6 +175,17 @@
 </div>
 
 <button class="mic-flotante" id="btn-mic" onclick="iniciarVoz()">🎙️</button>
+
+
+<!-- MODAL EDITAR VENTA -->
+<div class="modal-overlay" id="modal-editar-venta">
+    <div class="modal">
+        <div class="modal-titulo">✏️ Editar Venta</div>
+        <div id="editar-venta-items"></div>
+        <button class="modal-btn modal-btn-rojo" onclick="guardarEdicionVenta()">💾 Guardar Cambios</button>
+        <button class="modal-btn modal-btn-gris" onclick="cerrarModal('modal-editar-venta')">✕ Cancelar</button>
+    </div>
+</div>
 
 <!-- MODAL CLAVE -->
 <div class="modal-overlay" id="modal-clave">
@@ -540,7 +553,10 @@ function renderVentas() {
         <div class="venta-grupo">
             <div class="venta-grupo-header">
                 <div class="venta-hora">🕐 ${v.hora}</div>
-                <button class="venta-borrar" onclick="borrarVenta(${v.id})">✕</button>
+                <div class="venta-acciones">
+                    <button class="venta-editar" onclick="editarVenta(${v.id})">✏️</button>
+                    <button class="venta-borrar" onclick="borrarVenta(${v.id})">🗑️</button>
+                </div>
             </div>
             ${v.items.map(i => `
                 <div class="venta-linea">
@@ -562,6 +578,59 @@ function borrarVenta(id) {
     guardarVentas();
     actualizarTotalHeader();
     renderVentas();
+}
+
+
+// =============================================
+// EDITAR VENTA
+// =============================================
+let ventaEditandoId = null;
+
+function editarVenta(id) {
+    const venta = ventasDelDia.find(v => v.id === id);
+    if (!venta) return;
+    ventaEditandoId = id;
+    
+    document.getElementById('editar-venta-items').innerHTML = venta.items.map((item, i) => `
+        <div style="background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:22px">${item.producto.emoji}</span>
+                <div style="flex:1">
+                    <div style="font-weight:800;font-size:14px">${item.producto.nombre}</div>
+                    <div style="font-size:11px;color:#888">RD$ ${item.producto.precio} c/u</div>
+                </div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo)" id="sub-${i}">RD$ ${item.subtotal.toLocaleString()}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+                <button onclick="cambiarCant(${i},-1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">−</button>
+                <span id="cant-${i}" style="font-family:'Bebas Neue',sans-serif;font-size:32px;min-width:40px;text-align:center">${item.cantidad}</span>
+                <button onclick="cambiarCant(${i},1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">+</button>
+            </div>
+        </div>`).join('');
+    
+    document.getElementById('modal-editar-venta').classList.add('activo');
+}
+
+function cambiarCant(itemIdx, delta) {
+    const venta = ventasDelDia.find(v => v.id === ventaEditandoId);
+    if (!venta) return;
+    const item = venta.items[itemIdx];
+    const nuevaCant = item.cantidad + delta;
+    if (nuevaCant < 1) return;
+    item.cantidad = nuevaCant;
+    item.subtotal = nuevaCant * item.producto.precio;
+    document.getElementById('cant-' + itemIdx).textContent = nuevaCant;
+    document.getElementById('sub-' + itemIdx).textContent = 'RD$ ' + item.subtotal.toLocaleString();
+}
+
+function guardarEdicionVenta() {
+    const venta = ventasDelDia.find(v => v.id === ventaEditandoId);
+    if (!venta) return;
+    venta.total = venta.items.reduce((s, i) => s + i.subtotal, 0);
+    guardarVentas();
+    actualizarTotalHeader();
+    renderVentas();
+    cerrarModal('modal-editar-venta');
 }
 
 function actualizarTotalHeader() {
