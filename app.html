@@ -83,11 +83,15 @@
         .manual-subtotal{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--rojo);margin-left:auto}
 
         /* TOTAL MANUAL */
-        .manual-total-bar{background:linear-gradient(135deg,var(--rojo),var(--rojo-oscuro));color:white;border-radius:16px;padding:16px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:48px;z-index:50;box-shadow:var(--sombra)}
-        .manual-total-label{font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:1px}
-        .manual-total-monto{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--amarillo)}
-        .btn-registrar{background:var(--amarillo);color:var(--rojo-oscuro);border:none;border-radius:12px;padding:14px;width:100%;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:16px;touch-action:manipulation}
-        .btn-registrar:disabled{background:#ccc;color:#999}
+        .manual-total-bar{background:linear-gradient(135deg,var(--rojo),var(--rojo-oscuro));color:white;border-radius:16px;padding:16px 20px;margin-bottom:12px;position:sticky;top:48px;z-index:50;box-shadow:var(--sombra)}
+        .manual-total-actual-label{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:1px}
+        .manual-total-actual{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--amarillo);line-height:1}
+        .manual-lista-resumen{margin:8px 0;border-top:1px solid rgba(255,255,255,.2);padding-top:8px}
+        .manual-resumen-fila{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px}
+        .manual-resumen-nombre{opacity:.9}
+        .manual-resumen-sub{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--amarillo)}
+        .btn-registrar-manual{background:var(--amarillo);color:var(--rojo-oscuro);border:none;border-radius:10px;padding:12px;width:100%;font-size:15px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:10px;touch-action:manipulation}
+        .btn-registrar-manual:disabled{background:rgba(255,255,255,.2);color:rgba(255,255,255,.4)}
 
         /* INVENTARIO */
         .producto-item{background:white;border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -148,6 +152,9 @@
         .btn-editar-prod{background:#333;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
         .btn-eliminar-prod{background:#ffeeee;color:var(--rojo);border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
         .divider{border:none;border-top:2px solid #eee;margin:16px 0}
+        .editor-item.arrastrando{opacity:.4;border:2px dashed var(--rojo)}
+        .editor-item{cursor:grab}
+        .drag-handle{font-size:18px;opacity:.3;margin-right:4px;cursor:grab}
         .label{font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
     </style>
 </head>
@@ -158,7 +165,7 @@
         <div class="brand">🍦 BON</div>
         <div class="fecha" id="fecha-hoy"></div>
     </div>
-    <div class="total-label">Total del día</div>
+    <div class="total-label">Venta del día</div>
     <div class="total-grande" id="total-dia">RD$ 0</div>
 </div>
 
@@ -189,11 +196,10 @@
 <!-- MANUAL -->
 <div class="pantalla" id="tab-manual">
     <div class="manual-total-bar">
-        <div>
-            <div class="manual-total-label">Total seleccionado</div>
-            <div class="manual-total-monto" id="manual-total">RD$ 0</div>
-        </div>
-        <button class="btn-registrar" id="btn-registrar" onclick="registrarManual()" style="width:auto;padding:10px 16px;margin:0" disabled>✅ Registrar</button>
+        <div class="manual-total-actual-label">Total actual</div>
+        <div class="manual-total-actual" id="manual-total">RD$ 0</div>
+        <div class="manual-lista-resumen" id="manual-resumen"></div>
+        <button class="btn-registrar-manual" id="btn-registrar" onclick="registrarManual()" disabled>✅ Registrar venta</button>
     </div>
     <div class="manual-grid" id="manual-grid"></div>
 </div>
@@ -409,8 +415,17 @@ function cambiarManual(i, delta) {
 
 function actualizarTotalManual() {
     let total = 0;
-    INVENTARIO.forEach((p, i) => { total += (manualCantidades[i] || 0) * p.precio; });
+    const filas = [];
+    INVENTARIO.forEach((p, i) => {
+        const c = manualCantidades[i] || 0;
+        if(c > 0) {
+            const sub = c * p.precio;
+            total += sub;
+            filas.push('<div class="manual-resumen-fila"><span class="manual-resumen-nombre">' + c + 'x ' + p.emoji + ' ' + p.nombre + '</span><span class="manual-resumen-sub">RD$ ' + sub.toLocaleString() + '</span></div>');
+        }
+    });
     document.getElementById('manual-total').textContent = 'RD$ ' + total.toLocaleString();
+    document.getElementById('manual-resumen').innerHTML = filas.join('');
     document.getElementById('btn-registrar').disabled = total === 0;
 }
 
@@ -460,7 +475,8 @@ function abrirEditor() {
 
 function renderListaEditor() {
     document.getElementById('lista-editor').innerHTML = INVENTARIO.map((p, i) => `
-        <div class="editor-item">
+        <div class="editor-item" draggable="true" data-idx="${i}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event)">
+            <div class="drag-handle">☰</div>
             <div class="editor-emoji">${p.emoji}</div>
             <div class="editor-info">
                 <div class="editor-nombre">${p.nombre}</div>
@@ -505,6 +521,28 @@ function guardarProducto() {
 function limpiarFormEditor() {
     document.getElementById('edit-index').value = '-1';
     ['edit-emoji','edit-nombre','edit-precio','edit-aliases'].forEach(id => document.getElementById(id).value = '');
+}
+
+
+// DRAG AND DROP
+let dragIdx = null;
+function dragStart(e) {
+    dragIdx = parseInt(e.currentTarget.dataset.idx);
+    e.currentTarget.classList.add('arrastrando');
+}
+function dragOver(e) {
+    e.preventDefault();
+}
+function dragDrop(e) {
+    e.preventDefault();
+    const dropIdx = parseInt(e.currentTarget.dataset.idx);
+    if(dragIdx === null || dragIdx === dropIdx) return;
+    const item = INVENTARIO.splice(dragIdx, 1)[0];
+    INVENTARIO.splice(dropIdx, 0, item);
+    dragIdx = null;
+    guardarInv();
+    renderListaEditor();
+    renderInventario();
 }
 
 function cerrarModal(id) { document.getElementById(id).classList.remove('activo'); }
