@@ -152,9 +152,7 @@
         .btn-editar-prod{background:#333;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
         .btn-eliminar-prod{background:#ffeeee;color:var(--rojo);border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
         .divider{border:none;border-top:2px solid #eee;margin:16px 0}
-        .editor-item.arrastrando{opacity:.4;border:2px dashed var(--rojo)}
-        .editor-item{cursor:grab}
-        .drag-handle{font-size:18px;opacity:.3;margin-right:4px;cursor:grab}
+        .btn-mover{background:none;border:1px solid #ddd;border-radius:6px;padding:4px 6px;font-size:14px;cursor:pointer;color:#666}
         .label{font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
     </style>
 </head>
@@ -475,8 +473,11 @@ function abrirEditor() {
 
 function renderListaEditor() {
     document.getElementById('lista-editor').innerHTML = INVENTARIO.map((p, i) => `
-        <div class="editor-item" draggable="true" data-idx="${i}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event)">
-            <div class="drag-handle">☰</div>
+        <div class="editor-item">
+            <div style="display:flex;flex-direction:column;gap:3px;margin-right:6px">
+                <button class="btn-mover" onclick="moverProducto(${i},-1)">▲</button>
+                <button class="btn-mover" onclick="moverProducto(${i},1)">▼</button>
+            </div>
             <div class="editor-emoji">${p.emoji}</div>
             <div class="editor-info">
                 <div class="editor-nombre">${p.nombre}</div>
@@ -524,22 +525,13 @@ function limpiarFormEditor() {
 }
 
 
-// DRAG AND DROP
-let dragIdx = null;
-function dragStart(e) {
-    dragIdx = parseInt(e.currentTarget.dataset.idx);
-    e.currentTarget.classList.add('arrastrando');
-}
-function dragOver(e) {
-    e.preventDefault();
-}
-function dragDrop(e) {
-    e.preventDefault();
-    const dropIdx = parseInt(e.currentTarget.dataset.idx);
-    if(dragIdx === null || dragIdx === dropIdx) return;
-    const item = INVENTARIO.splice(dragIdx, 1)[0];
-    INVENTARIO.splice(dropIdx, 0, item);
-    dragIdx = null;
+// MOVER PRODUCTOS
+function moverProducto(i, dir) {
+    const nuevo = i + dir;
+    if(nuevo < 0 || nuevo >= INVENTARIO.length) return;
+    const temp = INVENTARIO[i];
+    INVENTARIO[i] = INVENTARIO[nuevo];
+    INVENTARIO[nuevo] = temp;
     guardarInv();
     renderListaEditor();
     renderInventario();
