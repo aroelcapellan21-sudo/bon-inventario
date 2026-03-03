@@ -18,7 +18,7 @@
         .brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--amarillo)}
         .header-right{display:flex;align-items:center;gap:10px}
         .fecha{font-size:12px;opacity:.8;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:20px}
-        .btn-agregar{background:rgba(255,255,255,.2);border:2px solid var(--amarillo);color:var(--amarillo);width:34px;height:34px;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;flex-shrink:0}
+        .btn-agregar{position:fixed;top:16px;right:16px;background:var(--rojo-oscuro);border:3px solid var(--amarillo);color:var(--amarillo);width:44px;height:44px;border-radius:50%;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);touch-action:manipulation}
         .total-label{font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:2px;text-align:center}
         .total-grande{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--amarillo);text-align:center;text-shadow:2px 2px 0 rgba(0,0,0,.3)}
 
@@ -126,12 +126,13 @@
         <div class="brand">🍦 BON</div>
         <div class="header-right">
             <div class="fecha" id="fecha-hoy"></div>
-            <div class="btn-agregar" onclick="abrirClave()">+</div>
         </div>
     </div>
     <div class="total-label">Total del día</div>
     <div class="total-grande" id="total-dia">RD$ 0</div>
 </div>
+
+<button class="btn-agregar" onclick="abrirClave()">+</button>
 
 <div class="tabs">
     <div class="tab activo" onclick="cambiarTab('ventas',this)">🧾 Ventas</div>
