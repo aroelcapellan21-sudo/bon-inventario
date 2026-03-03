@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🍦 Bon Inventario</title>
     <meta name="theme-color" content="#CC0000">
+    <link rel="manifest" href="manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800;900&display=swap');
         :root{--rojo:#CC0000;--rojo-oscuro:#990000;--amarillo:#FFD700;--gris:#888;--sombra:0 8px 32px rgba(0,0,0,0.15)}
@@ -16,15 +17,16 @@
         .header::before{content:'🍦';position:absolute;right:-10px;top:-10px;font-size:80px;opacity:.15;transform:rotate(20deg)}
         .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
         .brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--amarillo)}
-        .header-right{display:flex;align-items:center;gap:10px}
         .fecha{font-size:12px;opacity:.8;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:20px}
-        .btn-agregar{position:fixed;top:16px;right:16px;background:var(--rojo-oscuro);border:3px solid var(--amarillo);color:var(--amarillo);width:44px;height:44px;border-radius:50%;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);touch-action:manipulation}
         .total-label{font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:2px;text-align:center}
         .total-grande{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--amarillo);text-align:center;text-shadow:2px 2px 0 rgba(0,0,0,.3)}
 
+        /* BTN AGREGAR */
+        .btn-agregar{position:fixed;top:16px;right:16px;background:var(--rojo-oscuro);border:3px solid var(--amarillo);color:var(--amarillo);width:44px;height:44px;border-radius:50%;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);touch-action:manipulation}
+
         /* TABS */
         .tabs{display:flex;background:white;border-bottom:2px solid #eee;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-        .tab{flex:1;padding:12px 5px;text-align:center;font-size:12px;font-weight:800;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase}
+        .tab{flex:1;padding:10px 2px;text-align:center;font-size:11px;font-weight:800;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase}
         .tab.activo{color:var(--rojo);border-bottom-color:var(--rojo)}
         .pantalla{display:none;padding:16px}
         .pantalla.activa{display:block}
@@ -47,15 +49,15 @@
         .resumen-total td{font-weight:900;font-size:15px}
         .resumen-total td:last-child{font-size:26px;color:var(--amarillo)}
 
-        /* VENTAS */
+        /* VENTAS DEL DIA */
         .seccion-titulo{font-size:11px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:2px;margin:16px 0 8px}
         .venta-grupo{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);animation:slideIn .3s ease}
         @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         .venta-grupo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
         .venta-hora{font-size:11px;color:var(--gris);font-weight:600}
+        .venta-acciones{display:flex;gap:4px}
         .venta-borrar{background:none;border:none;font-size:16px;cursor:pointer;opacity:.35;padding:2px 4px}
         .venta-editar{background:none;border:none;font-size:16px;cursor:pointer;opacity:.5;padding:2px 4px}
-        .venta-acciones{display:flex;gap:4px}
         .venta-linea{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5}
         .venta-linea:last-of-type{border-bottom:none}
         .venta-cant-badge{background:var(--rojo);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;margin-right:10px}
@@ -67,6 +69,25 @@
         .venta-total-monto{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo)}
         .vacio{text-align:center;padding:40px 20px;color:var(--gris)}
         .vacio-emoji{font-size:48px;display:block;margin-bottom:12px}
+
+        /* MANUAL - GRID */
+        .manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+        .manual-card{background:white;border-radius:12px;padding:12px 10px;box-shadow:0 2px 8px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;gap:6px}
+        .manual-card-top{display:flex;align-items:center;gap:6px;width:100%}
+        .manual-precio-unit{font-size:11px;font-weight:800;color:var(--rojo);background:#fff0f0;padding:2px 6px;border-radius:6px;flex-shrink:0}
+        .manual-emoji{font-size:22px;flex-shrink:0}
+        .manual-nombre{font-weight:800;font-size:12px;flex:1;line-height:1.2}
+        .manual-controles{display:flex;align-items:center;gap:8px;width:100%}
+        .manual-btn{background:var(--rojo);color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation}
+        .manual-cant{font-family:'Bebas Neue',sans-serif;font-size:28px;min-width:30px;text-align:center;color:#333}
+        .manual-subtotal{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--rojo);margin-left:auto}
+
+        /* TOTAL MANUAL */
+        .manual-total-bar{background:linear-gradient(135deg,var(--rojo),var(--rojo-oscuro));color:white;border-radius:16px;padding:16px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:48px;z-index:50;box-shadow:var(--sombra)}
+        .manual-total-label{font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+        .manual-total-monto{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--amarillo)}
+        .btn-registrar{background:var(--amarillo);color:var(--rojo-oscuro);border:none;border-radius:12px;padding:14px;width:100%;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:16px;touch-action:manipulation}
+        .btn-registrar:disabled{background:#ccc;color:#999}
 
         /* INVENTARIO */
         .producto-item{background:white;border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -88,7 +109,18 @@
         .reporte-datos{text-align:right}
         .reporte-subtotal{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo)}
         .reporte-cant{font-size:11px;color:var(--gris)}
-        .btn-limpiar{background:#333;color:white;border:none;border-radius:12px;padding:14px;width:100%;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
+
+        /* HISTORIAL */
+        .historial-selector{background:white;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+        .historial-selector select{width:100%;border:2px solid #eee;border-radius:8px;padding:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;margin-top:6px}
+        .historial-dia{background:white;border-radius:12px;padding:14px 16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+        .historial-dia-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+        .historial-dia-fecha{font-weight:800;font-size:14px}
+        .historial-dia-total{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo)}
+        .historial-dia-detalle{margin-top:10px;border-top:1px solid #f0f0f0;padding-top:10px;display:none}
+        .historial-dia-detalle.abierto{display:block}
+
+        .btn-limpiar{background:#333;color:white;border:none;border-radius:12px;padding:14px;width:100%;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px}
 
         /* MIC */
         .mic-flotante{position:fixed;bottom:24px;right:24px;width:72px;height:72px;background:linear-gradient(135deg,var(--rojo),var(--rojo-oscuro));border:4px solid var(--amarillo);border-radius:50%;font-size:30px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(204,0,0,.5);transition:all .2s;z-index:999}
@@ -107,16 +139,14 @@
         .modal-btn-rojo{background:var(--rojo);color:white}
         .modal-btn-gris{background:#eee;color:#333}
         .modal-error{color:var(--rojo);font-size:13px;text-align:center;margin-bottom:8px;display:none}
-
-        /* LISTA EDITOR */
         .editor-item{background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
         .editor-emoji{font-size:24px;width:36px;text-align:center}
         .editor-info{flex:1}
         .editor-nombre{font-weight:800;font-size:14px}
         .editor-precio{font-size:12px;color:var(--gris)}
         .editor-btns{display:flex;gap:6px}
-        .btn-editar{background:#333;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
-        .btn-eliminar{background:#ffeeee;color:var(--rojo);border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+        .btn-editar-prod{background:#333;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+        .btn-eliminar-prod{background:#ffeeee;color:var(--rojo);border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
         .divider{border:none;border-top:2px solid #eee;margin:16px 0}
         .label{font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
     </style>
@@ -126,9 +156,7 @@
 <div class="header">
     <div class="header-top">
         <div class="brand">🍦 BON</div>
-        <div class="header-right">
-            <div class="fecha" id="fecha-hoy"></div>
-        </div>
+        <div class="fecha" id="fecha-hoy"></div>
     </div>
     <div class="total-label">Total del día</div>
     <div class="total-grande" id="total-dia">RD$ 0</div>
@@ -137,18 +165,20 @@
 <button class="btn-agregar" onclick="abrirClave()">+</button>
 
 <div class="tabs">
-    <div class="tab activo" onclick="cambiarTab('ventas',this)">🧾 Ventas</div>
+    <div class="tab activo" onclick="cambiarTab('ventas',this)">🧾 Hoy</div>
+    <div class="tab" onclick="cambiarTab('manual',this)">🖐️ Manual</div>
     <div class="tab" onclick="cambiarTab('inventario',this)">📦 Precios</div>
-    <div class="tab" onclick="cambiarTab('reporte',this)">📊 Reporte</div>
+    <div class="tab" onclick="cambiarTab('historial',this)">📅 Historial</div>
 </div>
 
+<!-- VENTAS DEL DIA -->
 <div class="pantalla activa" id="tab-ventas">
     <div class="flash" id="flash">
         <div class="flash-header">
             <div class="flash-emoji">🎙️</div>
             <div>
                 <div class="flash-titulo">Toca el micrófono y dicta</div>
-                <div class="flash-hint">Ej: "cinco magnum tres choco crema una pinta"</div>
+                <div class="flash-hint">Ej: "cinco magnum tres choco crema"</div>
             </div>
         </div>
     </div>
@@ -156,33 +186,44 @@
     <div id="lista-ventas"><div class="vacio"><span class="vacio-emoji">🍦</span>Aún no hay ventas registradas</div></div>
 </div>
 
+<!-- MANUAL -->
+<div class="pantalla" id="tab-manual">
+    <div class="manual-total-bar">
+        <div>
+            <div class="manual-total-label">Total seleccionado</div>
+            <div class="manual-total-monto" id="manual-total">RD$ 0</div>
+        </div>
+        <button class="btn-registrar" id="btn-registrar" onclick="registrarManual()" style="width:auto;padding:10px 16px;margin:0" disabled>✅ Registrar</button>
+    </div>
+    <div class="manual-grid" id="manual-grid"></div>
+</div>
+
+<!-- INVENTARIO -->
 <div class="pantalla" id="tab-inventario">
     <div class="seccion-titulo">Catálogo de productos</div>
     <div id="lista-inventario"></div>
 </div>
 
-<div class="pantalla" id="tab-reporte">
-    <div class="total-card">
-        <div class="total-card-label">Total acumulado</div>
-        <div class="total-card-monto" id="total-reporte">RD$ 0</div>
-        <div style="font-size:12px;opacity:.7;margin-top:4px" id="cant-ventas-reporte">0 ventas</div>
+<!-- HISTORIAL -->
+<div class="pantalla" id="tab-historial">
+    <div class="historial-selector">
+        <div class="seccion-titulo" style="margin:0 0 6px">Filtrar por mes</div>
+        <select id="historial-mes" onchange="renderHistorial()">
+            <option value="todos">Todos los días</option>
+        </select>
     </div>
-    <div class="reporte-card">
-        <div class="reporte-titulo">Desglose por producto</div>
-        <div id="desglose-reporte"><div class="vacio" style="padding:20px"><span class="vacio-emoji" style="font-size:32px">📊</span>Sin datos</div></div>
-    </div>
-    <button class="btn-limpiar" onclick="limpiarDia()">🗑️ Limpiar y empezar nuevo día</button>
+    <div id="lista-historial"></div>
+    <button class="btn-limpiar" onclick="limpiarDia()">🗑️ Limpiar día actual</button>
 </div>
 
 <button class="mic-flotante" id="btn-mic" onclick="iniciarVoz()">🎙️</button>
-
 
 <!-- MODAL EDITAR VENTA -->
 <div class="modal-overlay" id="modal-editar-venta">
     <div class="modal">
         <div class="modal-titulo">✏️ Editar Venta</div>
         <div id="editar-venta-items"></div>
-        <button class="modal-btn modal-btn-rojo" onclick="guardarEdicionVenta()">💾 Guardar Cambios</button>
+        <button class="modal-btn modal-btn-rojo" onclick="guardarEdicionVenta()">💾 Guardar</button>
         <button class="modal-btn modal-btn-gris" onclick="cerrarModal('modal-editar-venta')">✕ Cancelar</button>
     </div>
 </div>
@@ -198,16 +239,13 @@
     </div>
 </div>
 
-<!-- MODAL EDITOR -->
+<!-- MODAL EDITOR PRODUCTOS -->
 <div class="modal-overlay" id="modal-editor">
     <div class="modal">
         <div class="modal-titulo">⚙️ Gestionar Productos</div>
-
         <div id="lista-editor"></div>
-
         <hr class="divider">
         <div class="modal-titulo" style="font-size:18px;margin-bottom:12px">Agregar / Editar</div>
-
         <input type="hidden" id="edit-index" value="-1">
         <label class="label">Emoji</label>
         <input class="modal-input" id="edit-emoji" placeholder="🍦" maxlength="4">
@@ -215,9 +253,8 @@
         <input class="modal-input" id="edit-nombre" placeholder="Ej: Choco Crema">
         <label class="label">Precio (RD$)</label>
         <input class="modal-input" id="edit-precio" type="number" placeholder="Ej: 90">
-        <label class="label">Palabras para reconocer por voz (separadas por coma)</label>
+        <label class="label">Palabras para voz (separadas por coma)</label>
         <input class="modal-input" id="edit-aliases" placeholder="Ej: choco crema, choco, chocolo">
-
         <button class="modal-btn modal-btn-rojo" onclick="guardarProducto()">💾 Guardar Producto</button>
         <button class="modal-btn modal-btn-gris" onclick="limpiarFormEditor()">🔄 Limpiar</button>
         <button class="modal-btn modal-btn-gris" onclick="cerrarModal('modal-editor')">✕ Cerrar</button>
@@ -225,9 +262,6 @@
 </div>
 
 <script>
-// =============================================
-// INVENTARIO BASE
-// =============================================
 const INVENTARIO_BASE = [
     {nombre:"Choco Crema",precio:90,emoji:"🍫",aliases:["choco crema","choco cremas","choco","chocolo"]},
     {nombre:"Magnum",precio:175,emoji:"🍦",aliases:["magnum","magnun","mañum","magnes","mangún"]},
@@ -245,31 +279,21 @@ const INVENTARIO_BASE = [
     {nombre:"Paleta",precio:85,emoji:"🧊",aliases:["paleta","paletas"]},
 ];
 
-const NUMEROS = {
-    'un':1,'una':1,'uno':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,
-    'seis':6,'siete':7,'ocho':8,'nueve':9,'diez':10,
-    'once':11,'doce':12,'trece':13,'catorce':14,'quince':15,
-    'veinte':20,'treinta':30,'cuarenta':40,'cincuenta':50
-};
-
+const NUMEROS = {'un':1,'una':1,'uno':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,'seis':6,'siete':7,'ocho':8,'nueve':9,'diez':10,'once':11,'doce':12,'trece':13,'catorce':14,'quince':15,'veinte':20,'treinta':30,'cuarenta':40,'cincuenta':50};
 const CLAVE = "2008";
 
 let INVENTARIO = [];
 let ventasDelDia = [];
+let manualCantidades = {};
 
 // =============================================
 // STORAGE
 // =============================================
 function cargarTodo() {
-    try {
-        const inv = localStorage.getItem('bon_inventario');
-        INVENTARIO = inv ? JSON.parse(inv) : [...INVENTARIO_BASE];
-    } catch(e) { INVENTARIO = [...INVENTARIO_BASE]; }
-    try {
-        const hoy = new Date().toDateString();
-        const v = localStorage.getItem('bon_ventas_' + hoy);
-        ventasDelDia = v ? JSON.parse(v) : [];
-    } catch(e) { ventasDelDia = []; }
+    try { const i = localStorage.getItem('bon_inventario'); INVENTARIO = i ? JSON.parse(i) : [...INVENTARIO_BASE]; }
+    catch(e) { INVENTARIO = [...INVENTARIO_BASE]; }
+    try { const hoy = new Date().toDateString(); const v = localStorage.getItem('bon_'+hoy); ventasDelDia = v ? JSON.parse(v) : []; }
+    catch(e) { ventasDelDia = []; }
 }
 
 function guardarInventario() {
@@ -279,13 +303,37 @@ function guardarInventario() {
 function guardarVentas() {
     try {
         const hoy = new Date().toDateString();
-        localStorage.setItem('bon_ventas_' + hoy, JSON.stringify(ventasDelDia));
+        localStorage.setItem('bon_'+hoy, JSON.stringify(ventasDelDia));
+        // También guardar en historial permanente
+        const fechaKey = 'bon_hist_' + hoy;
+        localStorage.setItem(fechaKey, JSON.stringify(ventasDelDia));
+        actualizarSelectorMes();
     } catch(e) {}
 }
 
-cargarTodo();
+function obtenerTodasLasFechas() {
+    const fechas = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('bon_hist_')) {
+            fechas.push(key.replace('bon_hist_', ''));
+        }
+    }
+    return fechas.sort((a, b) => new Date(b) - new Date(a));
+}
 
-// Fecha
+function actualizarSelectorMes() {
+    const select = document.getElementById('historial-mes');
+    const fechas = obtenerTodasLasFechas();
+    const meses = [...new Set(fechas.map(f => {
+        const d = new Date(f);
+        return d.toLocaleDateString('es-DO', {month:'long', year:'numeric'});
+    }))];
+    select.innerHTML = '<option value="todos">Todos los días</option>' +
+        meses.map(m => `<option value="${m}">${m}</option>`).join('');
+}
+
+cargarTodo();
 document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-DO', {weekday:'short',day:'numeric',month:'short'});
 
 // =============================================
@@ -295,9 +343,10 @@ function cambiarTab(tab, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
     document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
     el.classList.add('activo');
-    document.getElementById('tab-' + tab).classList.add('activa');
-    if (tab === 'reporte') actualizarReporte();
+    document.getElementById('tab-'+tab).classList.add('activa');
     if (tab === 'inventario') renderInventario();
+    if (tab === 'manual') renderManual();
+    if (tab === 'historial') { actualizarSelectorMes(); renderHistorial(); }
 }
 
 // =============================================
@@ -317,6 +366,63 @@ function renderInventario() {
 renderInventario();
 
 // =============================================
+// MANUAL
+// =============================================
+function renderManual() {
+    manualCantidades = {};
+    INVENTARIO.forEach((p, i) => { manualCantidades[i] = 0; });
+    actualizarTotalManual();
+    document.getElementById('manual-grid').innerHTML = INVENTARIO.map((p, i) => `
+        <div class="manual-card">
+            <div class="manual-card-top">
+                <span class="manual-precio-unit">RD$${p.precio}</span>
+                <span class="manual-emoji">${p.emoji}</span>
+                <span class="manual-nombre">${p.nombre}</span>
+            </div>
+            <div class="manual-controles">
+                <button class="manual-btn" onclick="cambiarManual(${i},-1)">−</button>
+                <span class="manual-cant" id="mc-${i}">0</span>
+                <button class="manual-btn" onclick="cambiarManual(${i},1)">+</button>
+                <span class="manual-subtotal" id="ms-${i}"></span>
+            </div>
+        </div>`).join('');
+}
+
+function cambiarManual(i, delta) {
+    const nueva = Math.max(0, (manualCantidades[i] || 0) + delta);
+    manualCantidades[i] = nueva;
+    document.getElementById('mc-'+i).textContent = nueva;
+    const sub = nueva * INVENTARIO[i].precio;
+    document.getElementById('ms-'+i).textContent = sub > 0 ? 'RD$'+sub.toLocaleString() : '';
+    actualizarTotalManual();
+}
+
+function actualizarTotalManual() {
+    let total = 0;
+    INVENTARIO.forEach((p, i) => { total += (manualCantidades[i] || 0) * p.precio; });
+    document.getElementById('manual-total').textContent = 'RD$ ' + total.toLocaleString();
+    document.getElementById('btn-registrar').disabled = total === 0;
+}
+
+function registrarManual() {
+    const items = [];
+    INVENTARIO.forEach((p, i) => {
+        const cant = manualCantidades[i] || 0;
+        if (cant > 0) items.push({ producto: p, cantidad: cant, subtotal: cant * p.precio });
+    });
+    if (!items.length) return;
+    const total = items.reduce((s, i) => s + i.subtotal, 0);
+    const hora = new Date().toLocaleTimeString('es-DO', {hour:'2-digit',minute:'2-digit'});
+    ventasDelDia.push({id:Date.now(), items, total, hora, tipo:'manual'});
+    guardarVentas();
+    actualizarTotalHeader();
+    renderVentas();
+    renderManual();
+    mostrarFlashResumen(items, total);
+    cambiarTab('ventas', document.querySelectorAll('.tab')[0]);
+}
+
+// =============================================
 // MODAL CLAVE
 // =============================================
 function abrirClave() {
@@ -328,25 +434,17 @@ function abrirClave() {
 
 function verificarClave() {
     const clave = document.getElementById('input-clave').value.trim();
-    if (clave === CLAVE) {
-        cerrarModal('modal-clave');
-        abrirEditor();
-    } else {
-        document.getElementById('error-clave').style.display = 'block';
-        document.getElementById('input-clave').value = '';
-    }
+    if (clave === CLAVE) { cerrarModal('modal-clave'); abrirEditor(); }
+    else { document.getElementById('error-clave').style.display = 'block'; document.getElementById('input-clave').value = ''; }
 }
 
-document.getElementById('input-clave').addEventListener('keydown', e => {
-    if (e.key === 'Enter') verificarClave();
-});
+document.getElementById('input-clave').addEventListener('keydown', e => { if (e.key === 'Enter') verificarClave(); });
 
 // =============================================
-// MODAL EDITOR
+// EDITOR PRODUCTOS
 // =============================================
 function abrirEditor() {
-    renderListaEditor();
-    limpiarFormEditor();
+    renderListaEditor(); limpiarFormEditor();
     document.getElementById('modal-editor').classList.add('activo');
 }
 
@@ -359,8 +457,8 @@ function renderListaEditor() {
                 <div class="editor-precio">RD$ ${p.precio} · "${p.aliases[0]}"</div>
             </div>
             <div class="editor-btns">
-                <button class="btn-editar" onclick="editarProducto(${i})">✏️</button>
-                <button class="btn-eliminar" onclick="eliminarProducto(${i})">🗑️</button>
+                <button class="btn-editar-prod" onclick="editarProducto(${i})">✏️</button>
+                <button class="btn-eliminar-prod" onclick="eliminarProducto(${i})">🗑️</button>
             </div>
         </div>`).join('');
 }
@@ -377,10 +475,7 @@ function editarProducto(i) {
 
 function eliminarProducto(i) {
     if (confirm(`¿Eliminar "${INVENTARIO[i].nombre}"?`)) {
-        INVENTARIO.splice(i, 1);
-        guardarInventario();
-        renderListaEditor();
-        renderInventario();
+        INVENTARIO.splice(i, 1); guardarInventario(); renderListaEditor(); renderInventario();
     }
 }
 
@@ -389,42 +484,20 @@ function guardarProducto() {
     const nombre = document.getElementById('edit-nombre').value.trim();
     const precio = parseInt(document.getElementById('edit-precio').value);
     const aliasesRaw = document.getElementById('edit-aliases').value.trim();
-
-    if (!nombre || !precio) {
-        alert('El nombre y el precio son obligatorios.');
-        return;
-    }
-
-    const aliases = aliasesRaw
-        ? aliasesRaw.split(',').map(a => a.trim().toLowerCase()).filter(a => a)
-        : [nombre.toLowerCase()];
-
-    const producto = { nombre, precio, emoji, aliases };
+    if (!nombre || !precio) { alert('Nombre y precio son obligatorios.'); return; }
+    const aliases = aliasesRaw ? aliasesRaw.split(',').map(a => a.trim().toLowerCase()).filter(a => a) : [nombre.toLowerCase()];
+    const producto = {nombre, precio, emoji, aliases};
     const idx = parseInt(document.getElementById('edit-index').value);
-
-    if (idx >= 0) {
-        INVENTARIO[idx] = producto;
-    } else {
-        INVENTARIO.push(producto);
-    }
-
-    guardarInventario();
-    renderListaEditor();
-    renderInventario();
-    limpiarFormEditor();
+    if (idx >= 0) INVENTARIO[idx] = producto; else INVENTARIO.push(producto);
+    guardarInventario(); renderListaEditor(); renderInventario(); limpiarFormEditor();
 }
 
 function limpiarFormEditor() {
     document.getElementById('edit-index').value = '-1';
-    document.getElementById('edit-emoji').value = '';
-    document.getElementById('edit-nombre').value = '';
-    document.getElementById('edit-precio').value = '';
-    document.getElementById('edit-aliases').value = '';
+    ['edit-emoji','edit-nombre','edit-precio','edit-aliases'].forEach(id => document.getElementById(id).value = '');
 }
 
-function cerrarModal(id) {
-    document.getElementById(id).classList.remove('activo');
-}
+function cerrarModal(id) { document.getElementById(id).classList.remove('activo'); }
 
 // =============================================
 // VOZ
@@ -435,12 +508,8 @@ function iniciarVoz() {
     if (estaEscuchando) return;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { mostrarFlashSimple('error','❌','Usa Chrome','No soporta voz'); return; }
-
     recognition = new SR();
-    recognition.lang = 'es-DO';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
+    recognition.lang = 'es-DO'; recognition.continuous = false; recognition.interimResults = false;
     recognition.onstart = () => {
         estaEscuchando = true;
         document.getElementById('btn-mic').classList.add('escuchando');
@@ -462,19 +531,18 @@ function iniciarVoz() {
 
 function extraerCantidad(texto) {
     const m = texto.match(/^(\d+)\s*/);
-    if (m) return { cantidad: parseInt(m[1]), resto: texto.slice(m[0].length) };
+    if (m) return {cantidad:parseInt(m[1]), resto:texto.slice(m[0].length)};
     for (const [p, v] of Object.entries(NUMEROS)) {
-        if (texto.startsWith(p + ' ') || texto === p)
-            return { cantidad: v, resto: texto.slice(p.length).trim() };
+        if (texto.startsWith(p+' ') || texto === p) return {cantidad:v, resto:texto.slice(p.length).trim()};
     }
-    return { cantidad: 1, resto: texto };
+    return {cantidad:1, resto:texto};
 }
 
 function buscarProducto(texto) {
     let mejor = null, len = 0;
     for (const p of INVENTARIO)
         for (const a of p.aliases)
-            if (texto.includes(a) && a.length > len) { mejor = p; len = a.length; }
+            if (texto.includes(a) && a.length > len) {mejor = p; len = a.length;}
     return mejor;
 }
 
@@ -482,21 +550,18 @@ function procesarVentaMultiple(texto) {
     const partes = texto.split(/\s+(?:y|más|mas|con|coma|luego|después|despues)\s+/);
     const items = [];
     for (const parte of partes) {
-        const { cantidad, resto } = extraerCantidad(parte.trim());
+        const {cantidad, resto} = extraerCantidad(parte.trim());
         const prod = buscarProducto(resto || parte.trim());
         if (prod) {
             const ex = items.find(i => i.producto.nombre === prod.nombre);
-            if (ex) { ex.cantidad += cantidad; ex.subtotal += cantidad * prod.precio; }
-            else items.push({ producto: prod, cantidad, subtotal: cantidad * prod.precio });
+            if (ex) {ex.cantidad += cantidad; ex.subtotal += cantidad * prod.precio;}
+            else items.push({producto:prod, cantidad, subtotal:cantidad*prod.precio});
         }
     }
-    if (!items.length) {
-        mostrarFlashSimple('error','❓',`No entendí: "${texto}"`, 'Intenta de nuevo');
-        return;
-    }
-    const total = items.reduce((s, i) => s + i.subtotal, 0);
-    const hora = new Date().toLocaleTimeString('es-DO', { hour:'2-digit', minute:'2-digit' });
-    ventasDelDia.push({ id: Date.now(), items, total, hora });
+    if (!items.length) { mostrarFlashSimple('error','❓',`No entendí: "${texto}"`, 'Intenta de nuevo'); return; }
+    const total = items.reduce((s,i) => s+i.subtotal, 0);
+    const hora = new Date().toLocaleTimeString('es-DO', {hour:'2-digit',minute:'2-digit'});
+    ventasDelDia.push({id:Date.now(), items, total, hora, tipo:'voz'});
     guardarVentas();
     actualizarTotalHeader();
     renderVentas();
@@ -508,21 +573,12 @@ function procesarVentaMultiple(texto) {
 // FLASH UI
 // =============================================
 function mostrarFlashSimple(tipo, emoji, titulo, hint) {
-    document.getElementById('flash').className = 'flash ' + tipo;
-    document.getElementById('flash').innerHTML = `
-        <div class="flash-header">
-            <div class="flash-emoji">${emoji}</div>
-            <div><div class="flash-titulo">${titulo}</div><div class="flash-hint">${hint}</div></div>
-        </div>`;
+    document.getElementById('flash').className = 'flash '+tipo;
+    document.getElementById('flash').innerHTML = `<div class="flash-header"><div class="flash-emoji">${emoji}</div><div><div class="flash-titulo">${titulo}</div><div class="flash-hint">${hint}</div></div></div>`;
 }
 
 function mostrarFlashResumen(items, total) {
-    const filas = items.map(i => `
-        <tr>
-            <td>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</td>
-            <td>@${i.producto.precio}</td>
-            <td>RD$ ${i.subtotal.toLocaleString()}</td>
-        </tr>`).join('');
+    const filas = items.map(i => `<tr><td>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</td><td>@${i.producto.precio}</td><td>RD$ ${i.subtotal.toLocaleString()}</td></tr>`).join('');
     document.getElementById('flash').className = 'flash exito';
     document.getElementById('flash').innerHTML = `
         <div class="flash-header"><div class="flash-emoji">✅</div><div><div class="flash-titulo">Venta registrada</div></div></div>
@@ -531,12 +587,7 @@ function mostrarFlashResumen(items, total) {
         <table class="resumen-tabla resumen-total"><tr><td>TOTAL</td><td></td><td>RD$ ${total.toLocaleString()}</td></tr></table>`;
     setTimeout(() => {
         document.getElementById('flash').className = 'flash';
-        document.getElementById('flash').innerHTML = `
-            <div class="flash-header">
-                <div class="flash-emoji">🎙️</div>
-                <div><div class="flash-titulo">Listo. Toca para otra venta</div>
-                <div class="flash-hint">Puedes dictar varios productos juntos</div></div>
-            </div>`;
+        document.getElementById('flash').innerHTML = `<div class="flash-header"><div class="flash-emoji">🎙️</div><div><div class="flash-titulo">Listo. Toca para otra venta</div><div class="flash-hint">Puedes dictar varios productos juntos</div></div></div>`;
     }, 5000);
 }
 
@@ -545,14 +596,11 @@ function mostrarFlashResumen(items, total) {
 // =============================================
 function renderVentas() {
     const lista = document.getElementById('lista-ventas');
-    if (!ventasDelDia.length) {
-        lista.innerHTML = `<div class="vacio"><span class="vacio-emoji">🍦</span>Aún no hay ventas registradas</div>`;
-        return;
-    }
+    if (!ventasDelDia.length) { lista.innerHTML = `<div class="vacio"><span class="vacio-emoji">🍦</span>Aún no hay ventas registradas</div>`; return; }
     lista.innerHTML = [...ventasDelDia].reverse().map(v => `
         <div class="venta-grupo">
             <div class="venta-grupo-header">
-                <div class="venta-hora">🕐 ${v.hora}</div>
+                <div class="venta-hora">🕐 ${v.hora} ${v.tipo==='manual'?'🖐️':'🎙️'}</div>
                 <div class="venta-acciones">
                     <button class="venta-editar" onclick="editarVenta(${v.id})">✏️</button>
                     <button class="venta-borrar" onclick="borrarVenta(${v.id})">🗑️</button>
@@ -561,9 +609,7 @@ function renderVentas() {
             ${v.items.map(i => `
                 <div class="venta-linea">
                     <div class="venta-cant-badge">${i.cantidad}</div>
-                    <div class="venta-prod-nombre">${i.producto.emoji} ${i.producto.nombre}
-                        <span class="venta-prod-precio">@RD$${i.producto.precio}</span>
-                    </div>
+                    <div class="venta-prod-nombre">${i.producto.emoji} ${i.producto.nombre}<span class="venta-prod-precio"> @RD$${i.producto.precio}</span></div>
                     <div class="venta-subtotal">RD$ ${i.subtotal.toLocaleString()}</div>
                 </div>`).join('')}
             <div class="venta-total-grupo">
@@ -575,11 +621,8 @@ function renderVentas() {
 
 function borrarVenta(id) {
     ventasDelDia = ventasDelDia.filter(v => v.id !== id);
-    guardarVentas();
-    actualizarTotalHeader();
-    renderVentas();
+    guardarVentas(); actualizarTotalHeader(); renderVentas();
 }
-
 
 // =============================================
 // EDITAR VENTA
@@ -590,46 +633,37 @@ function editarVenta(id) {
     const venta = ventasDelDia.find(v => v.id === id);
     if (!venta) return;
     ventaEditandoId = id;
-    
     document.getElementById('editar-venta-items').innerHTML = venta.items.map((item, i) => `
         <div style="background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:10px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                 <span style="font-size:22px">${item.producto.emoji}</span>
-                <div style="flex:1">
-                    <div style="font-weight:800;font-size:14px">${item.producto.nombre}</div>
-                    <div style="font-size:11px;color:#888">RD$ ${item.producto.precio} c/u</div>
-                </div>
+                <div style="flex:1"><div style="font-weight:800;font-size:14px">${item.producto.nombre}</div><div style="font-size:11px;color:#888">RD$ ${item.producto.precio} c/u</div></div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo)" id="sub-${i}">RD$ ${item.subtotal.toLocaleString()}</div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;justify-content:center">
-                <button onclick="cambiarCant(${i},-1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">−</button>
+                <button onclick="cambiarCantVenta(${i},-1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">−</button>
                 <span id="cant-${i}" style="font-family:'Bebas Neue',sans-serif;font-size:32px;min-width:40px;text-align:center">${item.cantidad}</span>
-                <button onclick="cambiarCant(${i},1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">+</button>
+                <button onclick="cambiarCantVenta(${i},1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;font-weight:900">+</button>
             </div>
         </div>`).join('');
-    
     document.getElementById('modal-editar-venta').classList.add('activo');
 }
 
-function cambiarCant(itemIdx, delta) {
+function cambiarCantVenta(itemIdx, delta) {
     const venta = ventasDelDia.find(v => v.id === ventaEditandoId);
     if (!venta) return;
     const item = venta.items[itemIdx];
-    const nuevaCant = item.cantidad + delta;
-    if (nuevaCant < 1) return;
-    item.cantidad = nuevaCant;
-    item.subtotal = nuevaCant * item.producto.precio;
-    document.getElementById('cant-' + itemIdx).textContent = nuevaCant;
-    document.getElementById('sub-' + itemIdx).textContent = 'RD$ ' + item.subtotal.toLocaleString();
+    const nueva = Math.max(1, item.cantidad + delta);
+    item.cantidad = nueva; item.subtotal = nueva * item.producto.precio;
+    document.getElementById('cant-'+itemIdx).textContent = nueva;
+    document.getElementById('sub-'+itemIdx).textContent = 'RD$ '+item.subtotal.toLocaleString();
 }
 
 function guardarEdicionVenta() {
     const venta = ventasDelDia.find(v => v.id === ventaEditandoId);
     if (!venta) return;
-    venta.total = venta.items.reduce((s, i) => s + i.subtotal, 0);
-    guardarVentas();
-    actualizarTotalHeader();
-    renderVentas();
+    venta.total = venta.items.reduce((s,i) => s+i.subtotal, 0);
+    guardarVentas(); actualizarTotalHeader(); renderVentas();
     cerrarModal('modal-editar-venta');
 }
 
@@ -638,40 +672,50 @@ function actualizarTotalHeader() {
 }
 
 // =============================================
-// REPORTE
+// HISTORIAL
 // =============================================
-function actualizarReporte() {
-    const total = ventasDelDia.reduce((s,v) => s+v.total, 0);
-    document.getElementById('total-reporte').textContent = 'RD$ ' + total.toLocaleString();
-    document.getElementById('cant-ventas-reporte').textContent = ventasDelDia.length + ' ventas registradas';
-    const ag = {};
-    ventasDelDia.forEach(v => v.items.forEach(i => {
-        if (!ag[i.producto.nombre]) ag[i.producto.nombre] = {emoji:i.producto.emoji, cantidad:0, total:0};
-        ag[i.producto.nombre].cantidad += i.cantidad;
-        ag[i.producto.nombre].total += i.subtotal;
-    }));
-    const el = document.getElementById('desglose-reporte');
-    if (!Object.keys(ag).length) {
-        el.innerHTML = `<div class="vacio" style="padding:20px"><span class="vacio-emoji" style="font-size:32px">📊</span>Sin datos</div>`;
-        return;
-    }
-    el.innerHTML = Object.entries(ag).sort((a,b) => b[1].total-a[1].total).map(([n,d]) => `
-        <div class="reporte-fila">
-            <div class="reporte-producto">${d.emoji} ${n}</div>
-            <div class="reporte-datos">
-                <div class="reporte-subtotal">RD$ ${d.total.toLocaleString()}</div>
-                <div class="reporte-cant">${d.cantidad} unidades</div>
-            </div>
-        </div>`).join('');
+function renderHistorial() {
+    const filtro = document.getElementById('historial-mes').value;
+    const fechas = obtenerTodasLasFechas();
+    const fechasFiltradas = filtro === 'todos' ? fechas : fechas.filter(f => {
+        const d = new Date(f);
+        return d.toLocaleDateString('es-DO', {month:'long', year:'numeric'}) === filtro;
+    });
+
+    const el = document.getElementById('lista-historial');
+    if (!fechasFiltradas.length) { el.innerHTML = `<div class="vacio"><span class="vacio-emoji">📅</span>Sin historial</div>`; return; }
+
+    el.innerHTML = fechasFiltradas.map(fecha => {
+        const ventas = JSON.parse(localStorage.getItem('bon_hist_'+fecha) || '[]');
+        const total = ventas.reduce((s,v) => s+v.total, 0);
+        const d = new Date(fecha);
+        const fechaLabel = d.toLocaleDateString('es-DO', {weekday:'long', day:'numeric', month:'long'});
+        return `
+            <div class="historial-dia">
+                <div class="historial-dia-header" onclick="toggleHistorialDia('hd-${fecha.replace(/ /g,'_')}')">
+                    <div class="historial-dia-fecha">${fechaLabel}</div>
+                    <div class="historial-dia-total">RD$ ${total.toLocaleString()}</div>
+                </div>
+                <div class="historial-dia-detalle" id="hd-${fecha.replace(/ /g,'_')}">
+                    ${ventas.length ? ventas.map(v => `
+                        <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px">
+                            <div style="color:#888;font-size:11px">🕐 ${v.hora}</div>
+                            ${v.items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</span><span style="font-weight:800">RD$ ${i.subtotal.toLocaleString()}</span></div>`).join('')}
+                            <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo)">RD$ ${v.total.toLocaleString()}</div>
+                        </div>`).join('') : '<div style="padding:10px;color:#888;text-align:center">Sin ventas</div>'}
+                </div>
+            </div>`;
+    }).join('');
+}
+
+function toggleHistorialDia(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('abierto');
 }
 
 function limpiarDia() {
-    if (confirm('¿Seguro? Esto borrará todas las ventas del día.')) {
-        ventasDelDia = [];
-        guardarVentas();
-        actualizarTotalHeader();
-        renderVentas();
-        actualizarReporte();
+    if (confirm('¿Seguro? Esto borrará las ventas del día actual.')) {
+        ventasDelDia = []; guardarVentas(); actualizarTotalHeader(); renderVentas();
     }
 }
 
@@ -679,17 +723,20 @@ function hablar(texto) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(texto);
-    u.lang = 'es-DO'; u.rate = 1.1;
-    window.speechSynthesis.speak(u);
+    u.lang = 'es-DO'; u.rate = 1.1; window.speechSynthesis.speak(u);
 }
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// Permiso micrófono
+navigator.mediaDevices && navigator.mediaDevices.getUserMedia({audio:true})
+    .then(() => {}).catch(() => {});
 
 actualizarTotalHeader();
 renderVentas();
-
-// Solicitar permiso de micrófono al cargar
-navigator.mediaDevices.getUserMedia({audio: true})
-    .then(() => console.log('Micrófono listo'))
-    .catch(() => console.log('Sin micrófono'));
 </script>
 </body>
 </html>
