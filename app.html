@@ -257,6 +257,23 @@
 
 <button class="mic-flotante" id="btn-mic" onclick="iniciarVoz()">🎙️</button>
 
+<!-- MODAL PRODUCTO MANUAL -->
+<div class="modal-overlay" id="modal-prod-manual">
+    <div class="modal" style="text-align:center">
+        <div id="mpm-emoji" style="font-size:64px;margin-bottom:8px">&#127846;</div>
+        <div class="modal-titulo" id="mpm-nombre">Producto</div>
+        <div style="font-size:14px;color:#888;margin-bottom:20px" id="mpm-precio">RD$ 0 c/u</div>
+        <div style="display:flex;align-items:center;gap:24px;justify-content:center;margin:16px 0">
+            <button onclick="cambiarManualModal(-1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:60px;height:60px;font-size:30px;cursor:pointer;font-weight:900;touch-action:manipulation">&#8722;</button>
+            <span id="mpm-cant" style="font-family:Bebas Neue,sans-serif;font-size:80px;color:var(--rojo);min-width:70px;text-align:center;line-height:1">0</span>
+            <button onclick="cambiarManualModal(1)" style="background:var(--rojo);color:white;border:none;border-radius:50%;width:60px;height:60px;font-size:30px;cursor:pointer;font-weight:900;touch-action:manipulation">&#43;</button>
+        </div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:40px;color:#00c853;margin:8px 0" id="mpm-sub">RD$ 0</div>
+        <button class="modal-btn modal-btn-rojo" style="margin-top:16px" onclick="cerrarModal('modal-prod-manual')">&#10003; Listo</button>
+        <button class="modal-btn modal-btn-gris" onclick="resetManualModal()">&#128465; Quitar</button>
+    </div>
+</div>
+
 <!-- MODAL EDITAR VENTA -->
 <div class="modal-overlay" id="modal-editar-venta">
     <div class="modal">
@@ -434,7 +451,7 @@ function renderManual(){
     INVENTARIO.forEach((_,i)=>manualCantidades[i]=0);
     actualizarResumenManual();
     document.getElementById('manual-grid').innerHTML=INVENTARIO.map((p,i)=>`
-        <div class="manual-card" id="mcard-${i}">
+        <div class="manual-card" id="mcard-${i}" onclick="abrirModalProducto(${i})" style="cursor:pointer">
             ${modoOrden?`<div style="display:flex;justify-content:space-between;margin-bottom:6px">
                 <button class="btn-mover-manual" onclick="moverManual(${i},-1)">▲</button>
                 <span style="font-size:11px;color:rgba(255,255,255,.4);align-self:center">${p.nombre.split(' ')[0]}</span>
