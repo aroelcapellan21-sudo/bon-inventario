@@ -273,8 +273,8 @@
                 <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--rojo)" id="resumen-total-dinero">RD$ 0</span>
             </div>
             <div style="display:flex;justify-content:space-between;border-top:1px solid #f0f0f0;padding-top:8px;cursor:pointer" onclick="togglePuntos()">
-                <span style="font-weight:800;font-size:14px;color:#333">Total puntos 🔒</span>
-                <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00c853" id="resumen-total-puntos" class="oculto">0 pts</span>
+                <span style="font-weight:800;font-size:14px;color:#333" id="resumen-puntos-label">🔒 Ver puntos (clave)</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00c853" id="resumen-total-puntos"></span>
             </div>
         </div>
     </div>
@@ -496,21 +496,21 @@ function renderManual(){
     INVENTARIO.forEach((_,i)=>manualCantidades[i]=0);
     actualizarResumenManual();
     document.getElementById('manual-grid').innerHTML=INVENTARIO.map((p,i)=>`
-        <div class="manual-card" id="mcard-${i}" onclick="abrirModalProducto(${i})" style="cursor:pointer">
+        <div class="manual-card" id="mcard-${i}">
             ${modoOrden?`<div style="display:flex;justify-content:space-between;margin-bottom:6px">
                 <button class="btn-mover-manual" onclick="moverManual(${i},-1)">▲</button>
                 <span style="font-size:11px;color:rgba(255,255,255,.4);align-self:center">${p.nombre.split(' ')[0]}</span>
                 <button class="btn-mover-manual" onclick="moverManual(${i},1)">▼</button>
             </div>`:''}
-            <div class="manual-card-top">
+            <div class="manual-card-top" onclick="abrirModalProducto(${i})" style="cursor:pointer">
                 <span class="manual-precio-unit">RD$${p.precio}</span>
                 <span class="manual-emoji">${p.emoji}</span>
                 <span class="manual-nombre">${p.nombre}</span>
             </div>
             <div class="manual-controles">
-                <button class="manual-btn" onclick="cambiarManual(${i},-1)">−</button>
+                <button class="manual-btn" onclick="event.stopPropagation();cambiarManual(${i},-1)">−</button>
                 <span class="manual-cant" id="mc-${i}">0</span>
-                <button class="manual-btn" onclick="cambiarManual(${i},1)">+</button>
+                <button class="manual-btn" onclick="event.stopPropagation();cambiarManual(${i},1)">+</button>
             </div>
         </div>`).join('');
 }
@@ -618,7 +618,16 @@ function renderResumen() {
     container.innerHTML = html;
     document.getElementById('resumen-total-dinero').textContent = 'RD$ ' + totalDinero.toLocaleString();
     const ptEl = document.getElementById('resumen-total-puntos');
-    if(ptEl) { ptEl.textContent = totalPuntos + ' pts'; }
+    const ptLabel = document.getElementById('resumen-puntos-label');
+    if(ptEl) {
+        if(puntosVisible) {
+            ptEl.textContent = totalPuntos + ' pts';
+            if(ptLabel) ptLabel.textContent = '🔓 Puntos (toca para ocultar)';
+        } else {
+            ptEl.textContent = '';
+            if(ptLabel) ptLabel.textContent = '🔒 Ver puntos (clave)';
+        }
+    }
 }
 
 let puntosVisible = false;
@@ -626,15 +635,13 @@ function togglePuntos() {
     if (!puntosVisible) {
         claveCallback = function() {
             puntosVisible = true;
-            const el = document.getElementById('resumen-total-puntos');
-            if(el) el.classList.remove('oculto');
+            renderResumen();
         };
         document.getElementById('modal-clave-total').classList.add('activo');
         document.getElementById('input-clave-total').value = '';
     } else {
         puntosVisible = false;
-        const el = document.getElementById('resumen-total-puntos');
-        if(el) el.classList.add('oculto');
+        renderResumen();
     }
 }
 
