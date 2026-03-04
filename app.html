@@ -435,10 +435,15 @@ function toggleTotal(){
 function verificarClaveTotal(){
     if(document.getElementById('input-clave-total').value.trim()===CLAVE){
         cerrarModal('modal-clave-total');
-        totalVisible=true;
-        document.getElementById('total-dia').classList.remove('oculto');
-        document.getElementById('btn-ver-total').textContent='🔓 Ocultar total';
-        document.getElementById('manual-total').classList.remove('oculto');
+        if(claveCallback){
+            claveCallback();
+            claveCallback=null;
+        } else {
+            totalVisible=true;
+            document.getElementById('total-dia').classList.remove('oculto');
+            document.getElementById('btn-ver-total').textContent='🔓 Ocultar total';
+            document.getElementById('manual-total').classList.remove('oculto');
+        }
     } else {
         document.getElementById('error-clave-total').style.display='block';
         document.getElementById('input-clave-total').value='';
