@@ -395,7 +395,7 @@ const INVENTARIO_BASE = [
 // IMAGENES PRODUCTOS
 const NUMEROS = {'un':1,'una':1,'uno':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,'seis':6,'siete':7,'ocho':8,'nueve':9,'diez':10,'once':11,'doce':12,'trece':13,'catorce':14,'quince':15,'veinte':20,'treinta':30,'cuarenta':40,'cincuenta':50};
 const CLAVE = "2008";
-let INVENTARIO=[], ventasDelDia=[], manualCantidades={}, modoOrdenManual=false, totalVisible=false;
+let INVENTARIO=[], ventasDelDia=[], manualCantidades={}, modoOrdenManual=false, totalVisible=false, claveCallback=null, puntosVisible=false;
 
 function cargarTodo() {
     try { const i=localStorage.getItem('bon_inv'); INVENTARIO=i?JSON.parse(i):[...INVENTARIO_BASE]; } catch(e){ INVENTARIO=[...INVENTARIO_BASE]; }
@@ -630,7 +630,6 @@ function renderResumen() {
     }
 }
 
-let puntosVisible = false;
 function togglePuntos() {
     if (!puntosVisible) {
         claveCallback = function() {
@@ -658,8 +657,6 @@ function borrarDia() {
     cerrarModal('modal-borrar-dia');
     mostrarFlash('Ventas del dia borradas', 'exito');
 }
-
-let claveCallback = null;
 
 // MODAL PRODUCTO GRANDE
 let prodModalIdx = null;
