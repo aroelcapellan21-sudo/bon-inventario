@@ -206,6 +206,7 @@
     <div class="tab" onclick="cambiarTab('manual',this)">🖐️ Manual</div>
     <div class="tab" onclick="cambiarTab('inventario',this)">📦 Precios</div>
     <div class="tab" onclick="cambiarTab('historial',this)">📅 Historial</div>
+    <div class="tab" onclick="cambiarTab('resumen',this)">📊 Resumen</div>
 </div>
 
 <!-- HOY -->
@@ -257,10 +258,42 @@
 
 <button class="mic-flotante" id="btn-mic" onclick="iniciarVoz()">🎙️</button>
 
+
+<!-- RESUMEN -->
+<div class="pantalla" id="tab-resumen">
+    <div style="padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--rojo)">📊 Resumen del Día</div>
+            <button onclick="confirmarBorrarDia()" style="background:#ffeeee;color:var(--rojo);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer">🗑️ Borrar día</button>
+        </div>
+        <div id="resumen-productos" style="margin-bottom:16px"></div>
+        <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.07)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                <span style="font-weight:800;font-size:14px;color:#333">Total vendido hoy</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--rojo)" id="resumen-total-dinero">RD$ 0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-top:1px solid #f0f0f0;padding-top:8px;cursor:pointer" onclick="togglePuntos()">
+                <span style="font-weight:800;font-size:14px;color:#333">Total puntos 🔒</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00c853" id="resumen-total-puntos" class="oculto">0 pts</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL BORRAR DIA -->
+<div class="modal-overlay" id="modal-borrar-dia">
+    <div class="modal" style="text-align:center">
+        <div class="modal-titulo" style="color:var(--rojo)">⚠️ Borrar día</div>
+        <p style="color:#666;margin-bottom:16px">¿Seguro que quieres borrar todas las ventas de hoy? Esto no se puede deshacer.</p>
+        <button class="modal-btn modal-btn-rojo" onclick="borrarDia()">🗑️ Sí, borrar todo</button>
+        <button class="modal-btn modal-btn-gris" onclick="cerrarModal('modal-borrar-dia')">Cancelar</button>
+    </div>
+</div>
+
 <!-- MODAL PRODUCTO MANUAL -->
 <div class="modal-overlay" id="modal-prod-manual">
     <div class="modal" style="text-align:center">
-        <div id="mpm-emoji" style="font-size:64px;margin-bottom:8px">&#127846;</div>
+        <div id="mpm-media" style="height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:8px"></div>
         <div class="modal-titulo" id="mpm-nombre">Producto</div>
         <div style="font-size:14px;color:#888;margin-bottom:20px" id="mpm-precio">RD$ 0 c/u</div>
         <div style="display:flex;align-items:center;gap:24px;justify-content:center;margin:16px 0">
@@ -330,30 +363,36 @@
 
 <script>
 const INVENTARIO_BASE = [
-    {nombre:"Choco Crema",precio:90,emoji:"🍫",aliases:["choco crema","choco cremas","choco","chocolo"]},
-    {nombre:"Magnum",precio:175,emoji:"🍦",aliases:["magnum","magnun","mañum","magnes","mangún"]},
-    {nombre:"Sandwich",precio:110,emoji:"🍪",aliases:["sandwich","sandwitch","sangwich","sanwich"]},
-    {nombre:"Mordisko",precio:110,emoji:"🍫",aliases:["mordisko","mordico","mordizco"]},
-    {nombre:"Copa Bon",precio:130,emoji:"🍨",aliases:["copa","copa bon","copas"]},
-    {nombre:"Dulce de Leche Vasito",precio:80,emoji:"🍮",aliases:["dulce de leche","vasito","dulce leche"]},
-    {nombre:"Pinta Regular",precio:270,emoji:"🍨",aliases:["pinta","pintas","pinta regular"]},
-    {nombre:"Pinta Premium",precio:380,emoji:"⭐",aliases:["pinta premium","etiqueta negra","premium","pinta negra"]},
-    {nombre:"Fudge Bar",precio:55,emoji:"🍫",aliases:["fudge","fudge bar","fuche"]},
-    {nombre:"Lenguiletta",precio:50,emoji:"👅",aliases:["lenguiletta","lenguileta","lengileta"]},
-    {nombre:"Tropical",precio:100,emoji:"🌴",aliases:["tropical","alfajor"]},
-    {nombre:"Paleta de Uva",precio:35,emoji:"🍇",aliases:["uva","uva de agua","paleta uva"]},
-    {nombre:"Paleta de Frambuesa",precio:35,emoji:"🍭",aliases:["frambuesa","roja","roja de agua","paleta roja"]},
-    {nombre:"Paleta de Fresa Crema",precio:85,emoji:"🍭",aliases:["fresa crema","fresa con crema"]},
-    {nombre:"Paleta de Fresa Natural",precio:85,emoji:"🍓",aliases:["fresa natural","paleta fresa"]},
-    {nombre:"Paleta de Chinola Crema",precio:85,emoji:"🍭",aliases:["chinola crema","chinola con crema"]},
-    {nombre:"Paleta de Chinola Natural",precio:85,emoji:"🍭",aliases:["chinola natural","chinola normal","chinola"]},
-    {nombre:"Paleta de Fresa de Agua",precio:35,emoji:"🍭",aliases:["fresa de agua","roja fresa","fresa de 35"]},
-    {nombre:"Paleta de Manzana",precio:35,emoji:"🍏",aliases:["manzana de agua","manzana","manzana de 35"]},
-    {nombre:"Paleta de Bizcocho",precio:55,emoji:"🎂",aliases:["bizcocho","paleta de maiz","maiz","maíz"]},
-    {nombre:"Paleta de Chocolate",precio:55,emoji:"🍫",aliases:["paleta de chocolate","chocolate natural","chocolate sin crema"]},
-    {nombre:"Paleta",precio:85,emoji:"🧊",aliases:["paleta","paletas"]},
+    {nombre:"Choco Crema",precio:90,emoji:"🍫",img:"",aliases:["choco crema","choco cremas","choco","chocolo"],puntos:12},
+    {nombre:"Magnum",precio:175,emoji:"🍦",img:"",aliases:["magnum","magnun","mañum","magnes","mangún"],puntos:27},
+    {nombre:"Sandwich",precio:110,emoji:"🍪",img:"",aliases:["sandwich","sandwitch","sangwich","sanwich"],puntos:13},
+    {nombre:"Mordisko",precio:110,emoji:"🍫",img:"",aliases:["mordisko","mordico","mordizco"],puntos:15},
+    {nombre:"Copa Bon",precio:130,emoji:"🍨",img:"",aliases:["copa","copa bon","copas"],puntos:18},
+    {nombre:"Dulce de Leche Vasito",precio:80,emoji:"🍮",img:"",aliases:["dulce de leche","vasito","dulce leche"],puntos:10},
+    {nombre:"Pinta Regular",precio:270,emoji:"🍨",img:"",aliases:["pinta","pintas","pinta regular"],puntos:35},
+    {nombre:"Pinta Etiqueta Negra",precio:380,emoji:"⭐",img:"",aliases:["pinta premium","etiqueta negra","premium","pinta negra"],puntos:47},
+    {nombre:"Fudge Bar",precio:55,emoji:"🍫",img:"",aliases:["fudge","fudge bar","fuche"],puntos:6},
+    {nombre:"BonIce",precio:50,emoji:"🧊",img:"",aliases:["bonice","bon ice","lenguiletta","lenguileta","lengileta"],puntos:6},
+    {nombre:"Tropical",precio:100,emoji:"🌴",img:"",aliases:["tropical","alfajor"],puntos:10},
+    {nombre:"Choco Choco",precio:90,emoji:"🍫",img:"",aliases:["choco choco","chochoco","doble choco"],puntos:12},
+    {nombre:"Barquito Fresa",precio:80,emoji:"🍓",img:"",aliases:["barquito fresa","barquito de fresa","barqito fresa"],puntos:10},
+    {nombre:"Barquito Vainilla",precio:80,emoji:"🍦",img:"",aliases:["barquito vainilla","barquito de vainilla","barqito vainilla"],puntos:10},
+    {nombre:"Barquito Chocolate",precio:80,emoji:"🍫",img:"",aliases:["barquito chocolate","barquito de chocolate","barqito chocolate"],puntos:10},
+    {nombre:"Paleta de Uva",precio:35,emoji:"🍇",img:"",aliases:["uva","uva de agua","paleta uva"],puntos:4},
+    {nombre:"Paleta de Frambuesa",precio:35,emoji:"🍭",img:"",aliases:["frambuesa","roja","roja de agua","paleta roja"],puntos:4},
+    {nombre:"Paleta de Fresa Crema",precio:85,emoji:"🍭",img:"",aliases:["fresa crema","fresa con crema"],puntos:10},
+    {nombre:"Paleta de Fresa Natural",precio:85,emoji:"🍓",img:"",aliases:["fresa natural","paleta fresa"],puntos:10},
+    {nombre:"Paleta de Chinola Crema",precio:85,emoji:"🍭",img:"",aliases:["chinola crema","chinola con crema"],puntos:10},
+    {nombre:"Paleta de Chinola Natural",precio:85,emoji:"🍭",img:"",aliases:["chinola natural","chinola normal","chinola"],puntos:10},
+    {nombre:"Paleta de Fresa de Agua",precio:35,emoji:"🍭",img:"",aliases:["fresa de agua","roja fresa","fresa de 35"],puntos:4},
+    {nombre:"Paleta de Manzana",precio:35,emoji:"🍏",img:"",aliases:["manzana de agua","manzana","manzana de 35"],puntos:4},
+    {nombre:"Paleta de Bizcocho",precio:55,emoji:"🎂",img:"",aliases:["bizcocho","paleta de maiz","maiz","maíz"],puntos:5},
+    {nombre:"Paleta de Chocolate",precio:55,emoji:"🍫",img:"",aliases:["paleta de chocolate","chocolate natural","chocolate sin crema"],puntos:6},
+    {nombre:"Paleta",precio:85,emoji:"🧊",img:"",aliases:["paleta","paletas"],puntos:10},
 ];
 
+
+// IMAGENES PRODUCTOS
 const NUMEROS = {'un':1,'una':1,'uno':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,'seis':6,'siete':7,'ocho':8,'nueve':9,'diez':10,'once':11,'doce':12,'trece':13,'catorce':14,'quince':15,'veinte':20,'treinta':30,'cuarenta':40,'cincuenta':50};
 const CLAVE = "2008";
 let INVENTARIO=[], ventasDelDia=[], manualCantidades={}, modoOrdenManual=false, totalVisible=false;
@@ -510,7 +549,7 @@ function actualizarResumenManual(){
 
 function registrarManual(){
     const items=[];
-    INVENTARIO.forEach((p,i)=>{const c=manualCantidades[i]||0;if(c>0)items.push({producto:p,cantidad:c,subtotal:c*p.precio});});
+    INVENTARIO.forEach((p,i)=>{const c=manualCantidades[i]||0;if(c>0)items.push({nombre:p.nombre,precio:p.precio,emoji:p.emoji,img:p.img||"",cantidad:c,subtotal:c*p.precio,puntos:p.puntos||0});});
     if(!items.length) return;
     const total=items.reduce((s,i)=>s+i.subtotal,0);
     const hora=new Date().toLocaleTimeString('es-DO',{hour:'2-digit',minute:'2-digit'});
