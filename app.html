@@ -576,8 +576,7 @@ function renderResumen() {
             const precio = item.precio || (item.producto && item.producto.precio) || 0;
             const emoji = item.emoji || (item.producto && item.producto.emoji) || '🍦';
             const img = item.img || '';
-            const prod = INVENTARIO.find(p => p.nombre === nombre);
-            const puntosProd = prod ? (prod.puntos || 0) : 0;
+            const puntosProd = item.puntos || (INVENTARIO.find(p => p.nombre === nombre) || {}).puntos || 0;
             if (!agrupado[nombre]) {
                 agrupado[nombre] = {cantidad:0, subtotal:0, puntos:0, img:img, emoji:emoji, precio:precio};
             }
