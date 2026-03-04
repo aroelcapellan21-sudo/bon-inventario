@@ -554,11 +554,99 @@ function registrarManual(){
     const total=items.reduce((s,i)=>s+i.subtotal,0);
     const hora=new Date().toLocaleTimeString('es-DO',{hour:'2-digit',minute:'2-digit'});
     ventasDelDia.push({id:Date.now(),items,total,hora,tipo:'manual'});
-    guardarVentas(); actualizarTotalHeader(); renderVentas(); renderManual();
+    guardarVentas(); actualizarTotalHeader(); renderVentas(); renderManual(); renderResumen();
     mostrarFlashResumen(items,total);
     cambiarTab('ventas',document.querySelectorAll('.tab')[0]);
 }
 
+
+
+// RESUMEN AGRUPADO
+function renderResumen() {
+    const agrupado = {};
+    ventasDelDia.forEach(venta => {
+        venta.items.forEach(item => {
+            const nombre = item.nombre || (item.producto && item.producto.nombre) || '';
+            const precio = item.precio || (item.producto && item.producto.precio) || 0;
+            const emoji = item.emoji || (item.producto && item.producto.emoji) || '🍦';
+            const img = item.img || '';
+            const prod = INVENTARIO.find(p => p.nombre === nombre);
+            const puntosProd = prod ? (prod.puntos || 0) : 0;
+            if (!agrupado[nombre]) {
+                agrupado[nombre] = {cantidad:0, subtotal:0, puntos:0, img:img, emoji:emoji, precio:precio};
+            }
+            agrupado[nombre].cantidad += item.cantidad;
+            agrupado[nombre].subtotal += item.cantidad * precio;
+            agrupado[nombre].puntos += puntosProd * item.cantidad;
+        });
+    });
+
+    const container = document.getElementById('resumen-productos');
+    if (!container) return;
+
+    const items = Object.entries(agrupado);
+    if (items.length === 0) {
+        container.innerHTML = '<div class="vacio">No hay ventas hoy</div>';
+        document.getElementById('resumen-total-dinero').textContent = 'RD$ 0';
+        document.getElementById('resumen-total-puntos').textContent = '0 pts';
+        return;
+    }
+
+    items.sort((a, b) => b[1].cantidad - a[1].cantidad);
+
+    let totalDinero = 0, totalPuntos = 0;
+    let html = '';
+    items.forEach(([nombre, d]) => {
+        totalDinero += d.subtotal;
+        totalPuntos += d.puntos;
+        const media = d.img ? '<img src="'+d.img+'" style="width:40px;height:40px;object-fit:contain" />' : '<span style="font-size:32px">'+d.emoji+'</span>';
+        html += '<div style="background:white;border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)">';
+        html += '<div style="width:40px;text-align:center">'+media+'</div>';
+        html += '<div style="flex:1"><div style="font-weight:800;font-size:14px;color:#333">'+nombre+'</div>';
+        html += '<div style="font-size:12px;color:#888">RD$ '+d.precio+' c/u</div></div>';
+        html += '<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--rojo)">x'+d.cantidad+'</div>';
+        html += '<div style="font-size:12px;font-weight:800;color:#333">RD$ '+d.subtotal.toLocaleString()+'</div></div>';
+        html += '</div>';
+    });
+
+    container.innerHTML = html;
+    document.getElementById('resumen-total-dinero').textContent = 'RD$ ' + totalDinero.toLocaleString();
+    const ptEl = document.getElementById('resumen-total-puntos');
+    if(ptEl) { ptEl.textContent = totalPuntos + ' pts'; }
+}
+
+let puntosVisible = false;
+function togglePuntos() {
+    if (!puntosVisible) {
+        claveCallback = function() {
+            puntosVisible = true;
+            const el = document.getElementById('resumen-total-puntos');
+            if(el) el.classList.remove('oculto');
+        };
+        document.getElementById('modal-clave-total').classList.add('activo');
+        document.getElementById('input-clave-total').value = '';
+    } else {
+        puntosVisible = false;
+        const el = document.getElementById('resumen-total-puntos');
+        if(el) el.classList.add('oculto');
+    }
+}
+
+function confirmarBorrarDia() {
+    document.getElementById('modal-borrar-dia').classList.add('activo');
+}
+
+function borrarDia() {
+    ventasDelDia = [];
+    localStorage.removeItem('bon_' + new Date().toDateString());
+    actualizarTotalHeader();
+    renderVentas();
+    renderResumen();
+    cerrarModal('modal-borrar-dia');
+    mostrarFlash('Ventas del dia borradas', 'exito');
+}
+
+let claveCallback = null;
 
 // MODAL PRODUCTO GRANDE
 let prodModalIdx = null;
