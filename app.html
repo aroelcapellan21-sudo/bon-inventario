@@ -688,7 +688,7 @@ function mostrarFlashSimple(tipo,emoji,titulo,hint){
     document.getElementById('flash').innerHTML=`<div class="flash-header"><div class="flash-emoji">${emoji}</div><div><div class="flash-titulo">${titulo}</div><div class="flash-hint">${hint}</div></div></div>`;
 }
 function mostrarFlashResumen(items,total){
-    const filas=items.map(i=>`<tr><td>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</td><td>@${i.producto.precio}</td><td>RD$ ${i.subtotal.toLocaleString()}</td></tr>`).join('');
+    const filas=items.map(i=>`<tr><td>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</td><td>@${i.producto.precio}</td><td>RD$ ${(i.subtotal||(i.cantidad*(i.precio||i.producto?.precio))).toLocaleString()}</td></tr>`).join('');
     document.getElementById('flash').className='flash exito';
     document.getElementById('flash').innerHTML=`
         <div class="flash-header"><div class="flash-emoji">✅</div><div><div class="flash-titulo">Venta registrada</div></div></div>
@@ -717,8 +717,8 @@ function renderVentas(){
             ${v.items.map(i=>`
                 <div class="venta-linea">
                     <div class="venta-cant-badge">${i.cantidad}</div>
-                    <div class="venta-prod-nombre">${i.producto.emoji} ${i.producto.nombre}<span class="venta-prod-precio"> @RD$${i.producto.precio}</span></div>
-                    <div class="venta-subtotal">RD$ ${i.subtotal.toLocaleString()}</div>
+                    <div class="venta-prod-nombre">${i.emoji||i.producto?.emoji} ${i.nombre||i.producto?.nombre}<span class="venta-prod-precio"> @RD$${i.precio||i.producto?.precio}</span></div>
+                    <div class="venta-subtotal">RD$ ${(i.subtotal||(i.cantidad*(i.precio||i.producto?.precio))).toLocaleString()}</div>
                 </div>`).join('')}
             <div class="venta-total-grupo">
                 <div class="venta-total-label">Total venta</div>
@@ -791,7 +791,7 @@ function renderHistorial(){
                 ${ventas.map(v=>`
                     <div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px">
                         <div style="color:rgba(255,255,255,.4);font-size:11px">🕐 ${v.hora}</div>
-                        ${v.items.map(i=>`<div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.8)"><span>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</span><span style="font-weight:800;color:var(--amarillo)">RD$ ${i.subtotal.toLocaleString()}</span></div>`).join('')}
+                        ${v.items.map(i=>`<div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.8)"><span>${i.cantidad}x ${i.producto.emoji} ${i.producto.nombre}</span><span style="font-weight:800;color:var(--amarillo)">RD$ ${(i.subtotal||(i.cantidad*(i.precio||i.producto?.precio))).toLocaleString()}</span></div>`).join('')}
                         <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo)">RD$ ${v.total.toLocaleString()}</div>
                     </div>`).join('')}
             </div>
